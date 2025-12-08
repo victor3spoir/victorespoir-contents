@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: victor3spoir/portfolio-contents
+  repo: victor3spoir/victorespoir-contents
   branch: main
 
 media_folder: "images"
