@@ -1,9 +1,9 @@
 backend:
   name: github
-  repo: <GITHUB_USERNAME>/portfolio-content
+  repo: victor3spoir/portfolio-contents
   branch: main
 
-media_folder: "public/images"
+media_folder: "images"
 public_folder: "/images"
 
 collections:
