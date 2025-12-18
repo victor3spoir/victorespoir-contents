@@ -112,8 +112,70 @@ Before deploying any OAuth proxy, create a GitHub OAuth App:
 - Check that the OAuth app is authorized for the repository
 - Verify there are no branch protection rules blocking commits
 
+## Testing Your OAuth Proxy
+
+After deployment, you can test if your OAuth proxy is working:
+
+### 1. Basic Connectivity Test
+Visit your worker URL in a browser:
+```
+https://your-worker-url.workers.dev/
+```
+You should see a "Not Found" message (this is normal - the root path returns 404).
+
+### 2. Test Auth Endpoint
+Visit:
+```
+https://your-worker-url.workers.dev/auth?provider=github
+```
+You should be redirected to GitHub's OAuth page (if secrets are configured).
+
+### 3. Full Integration Test
+1. Update `admin/config.yml` with your worker URL
+2. Visit your CMS admin page
+3. Click "Login with GitHub"
+4. Should redirect through your worker to GitHub
+
+## Deployment Tips
+
+### Using npm Scripts
+The `package.json` includes helpful scripts:
+
+```bash
+npm run deploy                    # Deploy to Cloudflare
+npm run dev                       # Run locally for testing
+npm run tail                      # View real-time logs
+npm run secret:list               # List configured secrets
+npm run secret:put-client-id      # Add Client ID
+npm run secret:put-client-secret  # Add Client Secret
+```
+
+### Updating Your Worker
+To update after making changes:
+```bash
+wrangler deploy
+```
+
+### Viewing Logs
+To see real-time logs of your worker:
+```bash
+wrangler tail
+```
+
+This is helpful for debugging authentication issues.
+
+## Cost & Limits
+
+**Cloudflare Workers Free Tier:**
+- 100,000 requests per day
+- 10ms CPU time per request
+- More than enough for personal blogs and small teams
+
+For higher traffic, Cloudflare Workers paid plans start at $5/month with 10 million requests.
+
 ## Learn More
 
 - [Decap CMS GitHub Backend Docs](https://decapcms.org/docs/github-backend/)
 - [External OAuth Clients](https://decapcms.org/docs/external-oauth-clients/)
 - [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
+- [Wrangler CLI Docs](https://developers.cloudflare.com/workers/wrangler/)
