@@ -244,7 +244,9 @@ function handleSuccess(request, env, corsHeaders) {
       window.addEventListener("message", receiveMessage, false);
       
       console.log("Sending message to opener");
-      window.opener.postMessage("authorizing:github", "*");
+      // Use specific origin instead of wildcard for security
+      const allowedOrigin = "${env.ORIGIN || '*'}";
+      window.opener.postMessage("authorizing:github", allowedOrigin);
     })();
   </script>
 </body>
