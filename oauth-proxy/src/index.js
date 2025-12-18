@@ -12,9 +12,16 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname;
 
+    // Validate ORIGIN is configured
+    if (!env.ORIGIN || env.ORIGIN === "https://your-username.github.io") {
+      return new Response('ORIGIN not configured. Please set ORIGIN in wrangler.toml', {
+        status: 500,
+      });
+    }
+
     // Set CORS headers for all responses
     const corsHeaders = {
-      'Access-Control-Allow-Origin': env.ORIGIN || '*',
+      'Access-Control-Allow-Origin': env.ORIGIN,
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     };
@@ -220,22 +227,22 @@ function handleSuccess(request, env, corsHeaders) {
   </style>
 </head>
 <body>
-  <div class="container" id="auth-container" data-token="${escapedToken}">
+  <div class="container" id="auth-container" data-token="${escapedToken}" data-origin="${env.ORIGIN.replace(/"/g, '&quot;')}">
     <div class="checkmark">✓</div>
     <h1>Authorization Complete</h1>
     <p>You can close this window and return to the CMS.</p>
   </div>
   <script>
     (function() {
-      // Token passed securely via data attribute (not string interpolation)
+      // Token and origin passed securely via data attributes (not string interpolation)
       const container = document.getElementById('auth-container');
       const token = container.dataset.token;
+      const allowedOrigin = container.dataset.origin;
       
-      // Validate ORIGIN is configured for security
-      const allowedOrigin = "${env.ORIGIN}";
-      if (!allowedOrigin || allowedOrigin === "https://your-username.github.io") {
-        console.error("ORIGIN not configured in wrangler.toml!");
-        document.querySelector('.container').innerHTML = '<div class="checkmark">⚠</div><h1>Configuration Error</h1><p>ORIGIN not configured. Please update wrangler.toml and redeploy.</p>';
+      // Validate data is present
+      if (!token || !allowedOrigin) {
+        console.error("Missing required data!");
+        document.querySelector('.container').innerHTML = '<div class="checkmark">⚠</div><h1>Configuration Error</h1><p>Missing required configuration data.</p>';
         return;
       }
       
