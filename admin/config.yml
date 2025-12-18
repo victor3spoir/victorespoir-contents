@@ -2,6 +2,7 @@ backend:
   name: github
   repo: victor3spoir/victorespoir-contents
   branch: main
+  base_url: https://auth.decapcms.org
 
 media_folder: "images"
 public_folder: "/images"
