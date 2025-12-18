@@ -220,15 +220,24 @@ function handleSuccess(request, env, corsHeaders) {
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="auth-container" data-token="${escapedToken}">
     <div class="checkmark">✓</div>
     <h1>Authorization Complete</h1>
     <p>You can close this window and return to the CMS.</p>
   </div>
   <script>
     (function() {
-      // Token passed securely via data attribute
-      const token = "${escapedToken}";
+      // Token passed securely via data attribute (not string interpolation)
+      const container = document.getElementById('auth-container');
+      const token = container.dataset.token;
+      
+      // Validate ORIGIN is configured for security
+      const allowedOrigin = "${env.ORIGIN}";
+      if (!allowedOrigin || allowedOrigin === "https://your-username.github.io") {
+        console.error("ORIGIN not configured in wrangler.toml!");
+        document.querySelector('.container').innerHTML = '<div class="checkmark">⚠</div><h1>Configuration Error</h1><p>ORIGIN not configured. Please update wrangler.toml and redeploy.</p>';
+        return;
+      }
       
       function receiveMessage(e) {
         console.log("receiveMessage %o", e);
@@ -244,8 +253,6 @@ function handleSuccess(request, env, corsHeaders) {
       window.addEventListener("message", receiveMessage, false);
       
       console.log("Sending message to opener");
-      // Use specific origin instead of wildcard for security
-      const allowedOrigin = "${env.ORIGIN || '*'}";
       window.opener.postMessage("authorizing:github", allowedOrigin);
     })();
   </script>
