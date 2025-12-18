@@ -248,12 +248,20 @@ function handleSuccess(request, env, corsHeaders) {
       
       function receiveMessage(e) {
         console.log("receiveMessage %o", e);
+        
+        // Validate message origin matches allowed origin for security
+        if (e.origin !== allowedOrigin) {
+          console.error("Rejecting message from unauthorized origin:", e.origin);
+          return;
+        }
+        
+        // Only send token to validated origin
         window.opener.postMessage(
           'authorization:github:success:' + JSON.stringify({
             token: token,
             provider: "github"
           }),
-          e.origin
+          allowedOrigin  // Use validated origin, not e.origin
         );
         window.removeEventListener("message", receiveMessage, false);
       }
