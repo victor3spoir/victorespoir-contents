@@ -18,21 +18,33 @@ By the end of this guide, you'll have a fully functional CMS that:
 
 ## 📖 Step-by-Step Setup
 
-### Step 1: Understand the Configuration ✅
+### Step 1: Deploy an OAuth Proxy 🔐
 
-The repository is already configured with the correct `admin/config.yml`:
+⚠️ **IMPORTANT**: You must deploy your own OAuth proxy before authentication will work.
 
-```yaml
-backend:
-  name: github                           # Use GitHub backend
-  repo: victor3spoir/victorespoir-contents  # Your repository
-  branch: main                           # Target branch
-  base_url: https://auth.decapcms.org   # ⭐ KEY: Use Decap OAuth proxy
+**Quick Setup with Cloudflare Workers (Free)**:
+
+```bash
+# Install Wrangler CLI
+npm install -g wrangler
+
+# Login to Cloudflare
+wrangler login
+
+# Deploy the worker
+cd oauth-proxy
+wrangler deploy
 ```
 
-**Why `base_url` matters:**
-- ❌ Without it: Decap CMS may redirect to Netlify or fail to authenticate
-- ✅ With it: Authentication goes through Decap's official OAuth proxy
+You'll get a URL like: `https://decap-cms-oauth.your-subdomain.workers.dev`
+
+**Set your secrets** (you'll add these in Step 2):
+```bash
+wrangler secret put OAUTH_CLIENT_ID
+wrangler secret put OAUTH_CLIENT_SECRET
+```
+
+See [`oauth-proxy/README.md`](./oauth-proxy/README.md) for detailed instructions and alternative deployment options.
 
 ### Step 2: Create GitHub OAuth App 🔐
 
@@ -54,19 +66,21 @@ Or manually:
 | **Application name** | `Decap CMS - Victor Espoir Contents` |
 | **Homepage URL** | `https://victor3spoir.github.io/victorespoir-contents/` |
 | **Application description** | `Content management for victorespoir-contents` (optional) |
-| **Authorization callback URL** | `https://auth.decapcms.org/callback` |
+| **Authorization callback URL** | `https://your-worker-url.workers.dev/callback` |
 
-⚠️ **CRITICAL**: The callback URL MUST be exactly:
+⚠️ **CRITICAL**: The callback URL MUST match your deployed OAuth proxy:
 ```
-https://auth.decapcms.org/callback
+https://your-worker-url.workers.dev/callback
 ```
+
+Replace `your-worker-url.workers.dev` with the actual URL from Step 1.
 
 **Common Mistakes to Avoid:**
-- ❌ `https://victor3spoir.github.io/victorespoir-contents/admin/callback`
-- ❌ `https://auth.decapcms.org/`
-- ❌ `https://api.netlify.com/auth/done`
+- ❌ `https://victor3spoir.github.io/victorespoir-contents/admin/callback` (wrong - this is your site)
+- ❌ `https://auth.decapcms.org/callback` (wrong - this service doesn't exist)
+- ❌ `https://api.netlify.com/auth/done` (wrong - not using Netlify)
 
-The callback URL must point to the OAuth proxy, not your site!
+The callback URL must point to YOUR OAuth proxy, not your site!
 
 #### 2.3 Save Your Credentials
 
@@ -81,68 +95,62 @@ After clicking "Register application", you'll see:
    - Store it securely (password manager, secure notes, etc.)
    - Never commit this to your repository
 
-### Step 3: Configure OAuth Proxy 🔄
+### Step 3: Configure Your OAuth Proxy with Secrets 🔑
 
-You have two options:
+Add your GitHub OAuth credentials to your Cloudflare Worker:
 
-#### Option A: Self-Hosted OAuth Server (Recommended for Production)
+```bash
+cd oauth-proxy
 
-For production use, deploy your own OAuth server:
+# Set your Client ID
+wrangler secret put OAUTH_CLIENT_ID
+# Paste your Client ID when prompted
 
-1. Use the official Decap OAuth server: https://github.com/decaporg/decap-cms (see packages/decap-cms-lib-auth)
-2. Or use a community solution like:
-   - https://github.com/daviddarnes/netlify-cms-oauth-provider
-   - Deploy to Vercel, Heroku, or any Node.js hosting
+# Set your Client Secret
+wrangler secret put OAUTH_CLIENT_SECRET
+# Paste your Client Secret when prompted
+```
 
-3. Update your `config.yml` with your server URL:
+Verify secrets are set:
+```bash
+wrangler secret list
+```
+
+### Step 4: Update CMS Configuration ⚙️
+
+Edit `admin/config.yml` and set your OAuth proxy URL:
+
 ```yaml
 backend:
   name: github
   repo: victor3spoir/victorespoir-contents
   branch: main
-  base_url: https://your-oauth-server.vercel.app  # Your server
+  base_url: https://your-worker-url.workers.dev  # Your Cloudflare Worker URL
 ```
 
-#### Option B: Decap's Shared Proxy (Quick Start)
+Replace `your-worker-url.workers.dev` with your actual deployed worker URL from Step 1.
 
-The shared proxy at `https://auth.decapcms.org` is already configured and works out-of-the-box:
+### Step 5: Test the Setup ✨
 
-```yaml
-base_url: https://auth.decapcms.org
-```
-
-**How it works:**
-- Your GitHub OAuth App redirects to `https://auth.decapcms.org/callback`
-- The proxy handles the OAuth flow and returns the token to your CMS
-- No manual registration required with Decap
-- Suitable for testing, personal projects, and small sites
-
-**When to self-host (Option A):**
-- Production sites with many users
-- Need guaranteed uptime SLA
-- Want full control over the authentication flow
-- Corporate/enterprise requirements
-
-### Step 4: Test the Setup ✨
-
-#### 4.1 Access the Admin Interface
+#### 5.1 Access the Admin Interface
 
 Navigate to:
 ```
 https://victor3spoir.github.io/victorespoir-contents/admin/
 ```
 
-#### 4.2 Authentication Flow
+#### 5.2 Authentication Flow
 
 1. You should see the Decap CMS interface with a "Login with GitHub" button
 2. Click the button
-3. You'll be redirected to `auth.decapcms.org`
+3. You'll be redirected to your OAuth proxy (e.g., `your-worker.workers.dev`)
 4. Then redirected to GitHub's authorization page
 5. GitHub will ask you to authorize the OAuth app
 6. Click "Authorize [your-app-name]"
-7. You'll be redirected back to the CMS admin interface
+7. You'll be redirected back through your OAuth proxy
+8. Finally redirected back to the CMS admin interface, now authenticated!
 
-#### 4.3 Verify Access
+#### 5.3 Verify Access
 
 If successful, you should see:
 - The CMS dashboard
@@ -150,7 +158,7 @@ If successful, you should see:
 - Existing posts listed
 - "New Articles" button to create posts
 
-#### 4.4 Test Creating Content
+#### 5.4 Test Creating Content
 
 1. Click "New Articles"
 2. Fill in:
@@ -161,7 +169,7 @@ If successful, you should see:
 3. Click "Publish"
 4. Check your GitHub repository - you should see a new commit!
 
-### Step 5: Troubleshooting 🔧
+### Step 6: Troubleshooting 🔧
 
 #### Problem: "Failed to load config.yml"
 
@@ -170,18 +178,19 @@ If successful, you should see:
 - Verify the file is accessible at `https://victor3spoir.github.io/victorespoir-contents/admin/config.yml`
 - Check YAML syntax is valid
 
-#### Problem: Redirects to Netlify
+#### Problem: 404 Error on Authentication
 
 **Solutions:**
-- Verify `base_url: https://auth.decapcms.org` is in your `config.yml`
+- **Deploy an OAuth proxy first** - this is the most common issue
+- Verify your OAuth proxy is accessible: visit the URL in a browser
+- Check `base_url` in `config.yml` matches your deployed OAuth proxy URL exactly
 - Ensure you're not using `name: git-gateway` (should be `name: github`)
-- Clear browser cache and cookies
-- Try in incognito/private mode
+- See [`oauth-proxy/README.md`](./oauth-proxy/README.md) for deployment help
 
 #### Problem: "Authentication failed"
 
 **Solutions:**
-1. Verify GitHub OAuth App callback URL is exactly: `https://auth.decapcms.org/callback`
+1. Verify GitHub OAuth App callback URL matches: `https://your-worker-url.workers.dev/callback`
 2. Check that you've authorized the app in GitHub
 3. Ensure your OAuth app has access to the repository
 4. For organization repos, verify the org allows OAuth apps
@@ -258,15 +267,19 @@ When you're ready for production:
 
 Use this checklist to ensure everything is set up correctly:
 
-- [ ] `admin/config.yml` has `backend.name: github`
-- [ ] `admin/config.yml` has `base_url: https://auth.decapcms.org`
+- [ ] OAuth proxy deployed (Cloudflare Worker or alternative)
+- [ ] OAuth proxy URL is accessible (test in browser)
+- [ ] OAuth proxy secrets configured (Client ID & Secret)
 - [ ] GitHub OAuth App created
-- [ ] OAuth App callback URL is `https://auth.decapcms.org/callback`
+- [ ] OAuth App callback URL matches `https://your-worker-url.workers.dev/callback`
+- [ ] `admin/config.yml` has `backend.name: github`
+- [ ] `admin/config.yml` has `base_url` pointing to your OAuth proxy
 - [ ] Client ID and Client Secret saved securely
 - [ ] Can access admin interface at `/admin/`
 - [ ] "Login with GitHub" button appears
-- [ ] Authentication redirects to GitHub
+- [ ] Authentication redirects through OAuth proxy to GitHub (no 404!)
 - [ ] Can authorize the app successfully
+- [ ] Redirected back to CMS after authorization
 - [ ] Can see existing posts in CMS
 - [ ] Can create a new test post
 - [ ] Test post appears as commit in GitHub repository
