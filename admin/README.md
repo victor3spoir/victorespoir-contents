@@ -42,11 +42,18 @@ The OAuth App needs to be registered with Decap's OAuth proxy service. There are
 
 #### Option A: Self-Hosted OAuth Proxy (Recommended for Production)
 
-For production use, you should host your own OAuth server. See: https://decapcms.org/docs/external-oauth-clients/
+For production use, you should host your own OAuth server. Resources:
+- [External OAuth Clients Guide](https://decapcms.org/docs/external-oauth-clients/)
+- [Community OAuth Provider](https://github.com/daviddarnes/netlify-cms-oauth-provider) - Ready-to-deploy solution
 
 #### Option B: Decap's Shared OAuth Proxy (Quick Setup)
 
-For quick testing, Decap provides a shared OAuth proxy at `https://auth.decapcms.org`. However, note that you'll need to add your OAuth app credentials to their system or deploy your own OAuth server for production use.
+Decap provides a shared OAuth proxy at `https://auth.decapcms.org` that can be used for testing and small projects. This proxy works with properly configured GitHub OAuth Apps without requiring manual registration.
+
+**Important Notes:**
+- The shared proxy is suitable for personal projects and testing
+- For production use at scale, consider self-hosting for better reliability and control
+- Ensure your GitHub OAuth App callback URL is set to `https://auth.decapcms.org/callback`
 
 ### Step 3: Access the CMS
 

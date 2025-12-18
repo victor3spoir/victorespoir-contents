@@ -89,7 +89,7 @@ You have two options:
 
 For production use, deploy your own OAuth server:
 
-1. Use the official Decap OAuth server: https://github.com/decaporg/decap-cms/tree/master/packages/decap-cms-lib-auth
+1. Use the official Decap OAuth server: https://github.com/decaporg/decap-cms (see packages/decap-cms-lib-auth)
 2. Or use a community solution like:
    - https://github.com/daviddarnes/netlify-cms-oauth-provider
    - Deploy to Vercel, Heroku, or any Node.js hosting
@@ -103,16 +103,25 @@ backend:
   base_url: https://your-oauth-server.vercel.app  # Your server
 ```
 
-#### Option B: Decap's Shared Proxy (For Testing)
+#### Option B: Decap's Shared Proxy (Quick Start)
 
-⚠️ **Note**: The shared proxy at `https://auth.decapcms.org` is for testing. For production, consider option A.
+The shared proxy at `https://auth.decapcms.org` is already configured and works out-of-the-box:
 
-The current configuration already uses this:
 ```yaml
 base_url: https://auth.decapcms.org
 ```
 
-However, you may need to register your OAuth credentials with the proxy or deploy your own server.
+**How it works:**
+- Your GitHub OAuth App redirects to `https://auth.decapcms.org/callback`
+- The proxy handles the OAuth flow and returns the token to your CMS
+- No manual registration required with Decap
+- Suitable for testing, personal projects, and small sites
+
+**When to self-host (Option A):**
+- Production sites with many users
+- Need guaranteed uptime SLA
+- Want full control over the authentication flow
+- Corporate/enterprise requirements
 
 ### Step 4: Test the Setup ✨
 
