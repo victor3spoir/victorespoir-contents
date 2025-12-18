@@ -13,23 +13,27 @@ This is a content repository that stores Markdown blog posts and provides a web-
 1. A GitHub account with access to this repository
 2. A GitHub OAuth App configured for Decap CMS
 
-### Setting Up GitHub OAuth
+### Setting Up Authentication
 
-1. **Create a GitHub OAuth App**:
+⚠️ **IMPORTANT**: Decap CMS requires an OAuth proxy to authenticate with GitHub. You must deploy your own OAuth proxy before the CMS will work.
+
+**Quick Setup (3 steps)**:
+
+1. **Deploy an OAuth Proxy**:
+   - We provide a ready-to-use Cloudflare Worker (free tier available)
+   - See [`oauth-proxy/README.md`](./oauth-proxy/README.md) for detailed setup instructions
+   - Alternative: Use [DecapBridge](https://decapbridge.com/) (paid service, no deployment needed)
+
+2. **Create a GitHub OAuth App**:
    - Go to: https://github.com/settings/developers
    - Click "New OAuth App"
    - **Application name**: `Decap CMS for Victor Espoir`
    - **Homepage URL**: `https://victor3spoir.github.io/victorespoir-contents/`
-   - **Callback URL**: `https://auth.decapcms.org/callback` ⚠️ (Must be exact)
+   - **Callback URL**: `https://your-worker-url.workers.dev/callback` (use your actual OAuth proxy URL)
 
-2. **Save your credentials**:
-   - Copy the **Client ID** 
-   - Generate and securely store the **Client Secret**
-
-3. **Configure OAuth Proxy**:
-   - For production, consider self-hosting the OAuth server
-   - For testing, Decap provides a shared proxy at `https://auth.decapcms.org`
-   - See [`admin/README.md`](./admin/README.md) for detailed instructions
+3. **Update Configuration**:
+   - Edit `admin/config.yml` and set `base_url` to your OAuth proxy URL
+   - See [`admin/README.md`](./admin/README.md) for complete instructions
 
 ### Accessing the CMS
 
@@ -80,39 +84,41 @@ backend:
   name: github
   repo: victor3spoir/victorespoir-contents
   branch: main
-  base_url: https://auth.decapcms.org  # Decap OAuth proxy (not Netlify)
+  base_url: https://your-oauth-proxy-url  # Your deployed OAuth proxy
 ```
 
 **Key Points:**
 - ✅ Uses GitHub backend for direct repository access
-- ✅ Authenticates via GitHub OAuth
-- ✅ Uses Decap's OAuth proxy (not Netlify's)
+- ✅ Authenticates via GitHub OAuth through your own proxy
 - ✅ Commits changes directly to this repository
 - ❌ No Netlify services required
 - ❌ No Git Gateway dependency
+- ⚠️ **Requires OAuth proxy deployment** (see [`oauth-proxy/README.md`](./oauth-proxy/README.md))
 
-### Why `base_url` is Critical
+### Why an OAuth Proxy is Required
 
-Without the `base_url` setting, Decap CMS may default to Netlify's authentication services. The `base_url: https://auth.decapcms.org` configuration ensures that:
+Decap CMS cannot authenticate directly with GitHub from the browser for security reasons. The `base_url` setting points to your OAuth proxy which:
 
-1. Authentication goes through Decap's official OAuth proxy
-2. No Netlify account or services are required
-3. The CMS works with any static hosting (GitHub Pages, Vercel, etc.)
+1. Handles the secure OAuth handshake with GitHub
+2. Exchanges authorization codes for access tokens
+3. Returns tokens to the CMS client
 
-See [`admin/README.md`](./admin/README.md) for a complete explanation of why this configuration is necessary and common pitfalls to avoid.
+**There is no public shared OAuth proxy** - you must deploy your own or use a third-party service. See [`oauth-proxy/README.md`](./oauth-proxy/README.md) for deployment options.
 
 ## 🔐 Authentication Flow
 
 ```
-User → CMS Admin → Decap OAuth Proxy → GitHub OAuth → Authorized → CMS Interface
+User → CMS Admin → Your OAuth Proxy → GitHub OAuth → Authorized → CMS Interface
 ```
 
 1. User clicks "Login with GitHub" in the CMS
-2. Redirected to `auth.decapcms.org` 
-3. Redirected to GitHub for authorization
+2. Redirected to your OAuth proxy (e.g., `your-worker.workers.dev`) 
+3. OAuth proxy redirects to GitHub for authorization
 4. User grants access to the repository
-5. Redirected back to CMS with authentication token
-6. User can now create/edit posts that commit to GitHub
+5. GitHub redirects back to OAuth proxy with authorization code
+6. OAuth proxy exchanges code for access token
+7. Token is returned to CMS, user is authenticated
+8. User can now create/edit posts that commit to GitHub
 
 ## 🌐 Deployment
 
@@ -130,12 +136,13 @@ This repository is automatically deployed to GitHub Pages using GitHub Actions. 
 
 ### Authentication Issues
 
-If authentication fails or redirects to Netlify:
+If you get a 404 error or authentication fails:
 
-1. Verify `base_url: https://auth.decapcms.org` is set in `admin/config.yml`
-2. Check that your GitHub OAuth App callback URL is exactly: `https://auth.decapcms.org/callback`
-3. Ensure you're not using `git-gateway` backend (use `github` instead)
-4. Clear browser cache and try again
+1. **Verify OAuth proxy is deployed**: The most common issue is not having an OAuth proxy deployed
+2. **Check `base_url` in `admin/config.yml`**: Must point to your deployed OAuth proxy URL
+3. **Verify GitHub OAuth App callback URL**: Must exactly match `https://your-oauth-proxy-url/callback`
+4. **Ensure you're using `github` backend**: Not `git-gateway`
+5. See [`oauth-proxy/README.md`](./oauth-proxy/README.md) for detailed troubleshooting
 
 ### Content Not Saving
 

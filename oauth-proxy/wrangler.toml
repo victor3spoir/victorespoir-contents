@@ -1,0 +1,17 @@
+name = "decap-cms-oauth"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+# These are non-sensitive configuration values
+# IMPORTANT: Update ORIGIN to match your GitHub Pages or website URL
+# For this repository (victorespoir-contents), use:
+ORIGIN = "https://victor3spoir.github.io"
+# For your own site, replace with your URL (e.g., https://your-username.github.io)
+OAUTH_AUTHORIZE_URL = "https://github.com/login/oauth/authorize"
+OAUTH_TOKEN_URL = "https://github.com/login/oauth/access_token"
+SCOPES = "repo,user"
+
+# Secrets (set using: wrangler secret put SECRET_NAME)
+# OAUTH_CLIENT_ID - Your GitHub OAuth App Client ID
+# OAUTH_CLIENT_SECRET - Your GitHub OAuth App Client Secret

@@ -2,7 +2,11 @@ backend:
   name: github
   repo: victor3spoir/victorespoir-contents
   branch: main
-  base_url: https://auth.decapcms.org
+  # IMPORTANT: You must deploy your own OAuth proxy and set base_url
+  # See /oauth-proxy/README.md for deployment instructions
+  # Example: base_url: https://your-worker-name.your-subdomain.workers.dev
+  # Uncomment and update the line below after deploying your OAuth proxy:
+  # base_url: https://your-oauth-proxy-url-here
 
 media_folder: "images"
 public_folder: "/images"

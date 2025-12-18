@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Wrangler
+.wrangler/
+.dev.vars
+wrangler.toml.local
+
+# Secrets - NEVER commit these!
+.env
+.env.local
+secrets.json
+
+# OS
+.DS_Store
+Thumbs.db
