@@ -21,13 +21,19 @@ npm install -g wrangler
 wrangler login
 ```
 
-#### Step 2: Create Worker
+#### Step 2: Configure Origin URL
+Edit `wrangler.toml` and update the ORIGIN variable:
+```toml
+ORIGIN = "https://your-username.github.io"  # Your site URL
+```
+
+#### Step 3: Deploy Worker
 ```bash
 cd oauth-proxy
 wrangler deploy
 ```
 
-#### Step 3: Set Secrets
+#### Step 4: Set Secrets
 ```bash
 wrangler secret put OAUTH_CLIENT_ID
 # Paste your GitHub OAuth App Client ID
@@ -36,7 +42,7 @@ wrangler secret put OAUTH_CLIENT_SECRET
 # Paste your GitHub OAuth App Client Secret
 ```
 
-#### Step 4: Update CMS Config
+#### Step 5: Update CMS Config
 In `admin/config.yml`:
 ```yaml
 backend:

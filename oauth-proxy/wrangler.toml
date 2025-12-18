@@ -4,7 +4,8 @@ compatibility_date = "2024-01-01"
 
 [vars]
 # These are non-sensitive configuration values
-ORIGIN = "https://victor3spoir.github.io"
+# IMPORTANT: Update ORIGIN to match your GitHub Pages or website URL
+ORIGIN = "https://victor3spoir.github.io"  # CHANGE THIS to your site URL
 OAUTH_AUTHORIZE_URL = "https://github.com/login/oauth/authorize"
 OAUTH_TOKEN_URL = "https://github.com/login/oauth/access_token"
 SCOPES = "repo,user"

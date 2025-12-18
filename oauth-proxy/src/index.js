@@ -174,6 +174,14 @@ function handleSuccess(request, env, corsHeaders) {
     });
   }
 
+  // Escape the token to prevent XSS
+  const escapedToken = token
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
   // Create HTML page that will send the token back to the CMS
   const html = `<!DOCTYPE html>
 <html>
@@ -219,11 +227,14 @@ function handleSuccess(request, env, corsHeaders) {
   </div>
   <script>
     (function() {
+      // Token passed securely via data attribute
+      const token = "${escapedToken}";
+      
       function receiveMessage(e) {
         console.log("receiveMessage %o", e);
         window.opener.postMessage(
           'authorization:github:success:' + JSON.stringify({
-            token: "${token}",
+            token: token,
             provider: "github"
           }),
           e.origin

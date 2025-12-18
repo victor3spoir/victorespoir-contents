@@ -24,8 +24,10 @@ We've provided a complete OAuth proxy solution that you can deploy in **10 minut
 npm install -g wrangler
 wrangler login
 
-# 2. Deploy
+# 2. Configure and deploy
 cd oauth-proxy
+# Edit wrangler.toml and set ORIGIN to your site URL
+# (e.g., ORIGIN = "https://your-username.github.io")
 wrangler deploy
 # ✍️ Save the URL shown (e.g., https://decap-cms-oauth.your-name.workers.dev)
 

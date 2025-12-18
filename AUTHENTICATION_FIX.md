@@ -33,12 +33,15 @@ npm install -g wrangler
 # Login to Cloudflare
 wrangler login
 
-# Deploy the worker
+# Configure and deploy the worker
 cd oauth-proxy
+# Edit wrangler.toml and set ORIGIN to your site URL
 wrangler deploy
 ```
 
 This will give you a URL like: `https://decap-cms-oauth.your-subdomain.workers.dev`
+
+**Important**: Before deploying, edit `wrangler.toml` and update the `ORIGIN` variable to match your GitHub Pages URL (e.g., `https://your-username.github.io`).
 
 **Set your secrets**:
 
