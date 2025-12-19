@@ -1,10 +1,10 @@
 ---
 title: "demo posts"
 description: "small description...."
-published: false
+published: true
 coverImage: "https://raw.githubusercontent.com/victor3spoir/victorespoir-contents/main/contents/images/e9389d94-9df8-43d8-9898-3d687e35f3f0.jpg"
 createdAt: "2025-12-18T22:56:35.988Z"
-updatedAt: "2025-12-19T23:21:02.647Z"
+updatedAt: "2025-12-19T23:21:44.898Z"
 tags: ["devops", "cloud", "demo"]
 ---
 
