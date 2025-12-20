@@ -1,10 +1,10 @@
 ---
 title: "how start well in programming world ?"
 description: "starting with description..."
-published: true
+published: false
 coverImage: "https://raw.githubusercontent.com/victor3spoir/victorespoir-contents/main/contents/images/8d8ed10e-0206-4e3e-9649-262a835d17df.png"
 createdAt: "2025-12-19T02:34:45.596Z"
-updatedAt: "2025-12-19T23:35:14.808Z"
+updatedAt: "2025-12-20T02:19:18.564Z"
 tags: ["devops", "cloud", "small"]
 ---
 
@@ -15,5 +15,17 @@ Your content goes here.
 here is an image
 
 ![image](https://raw.githubusercontent.com/victor3spoir/victorespoir-contents/main/contents/images/c22cecf0-0e98-4078-a494-f77dc751fe7d.png)
+
+here is code
+
+
+
+```python
+import sys
+import os
+
+```
+
+
 
 end.
